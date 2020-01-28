@@ -39,35 +39,57 @@ int main(void) {
 
 
 
-	int cr, di; 
+	int cr, di, stri; 
 	FILE *file, *fld;
 	file = fopen("drl.txt", "rb");
   	fld = fopen("out.nc","wb");
 
+	fprintf (fld,"%s\r\n", "G90");
+	fprintf (fld,"%s\r\n", "G21");
+  	fprintf (fld,"%s\r\n", "S1000");
+  	fprintf (fld,"%s\r\n", "F100");
+  	fprintf (fld,"%s\r\n", "M03");
+	fprintf (fld, "%s\r\n", "G00 Z2.000 " );
     di=0;
-    while (1)
-    {
-        cr = fgetc (file);
-        if ( feof(file) )
-        {
-            break;
-        }
-        else if ( (cr >= '0') && (cr <='9') )
-        {
-            if ( di == 4 )
-            {
-                fputc ('.', fld);
-            }
-            di++;
-        }
-        else
-        {
-            di=0;
-        }
-        fputc (cr, fld);
-    }
+	stri=0;
+	while (1)
+	{
+		cr = fgetc (file);
+		if ( feof(file) )
+		{
+			break;
+		}
+		else 
+		{ 
+			if ( (cr >= '0') && (cr <='9') )
+			{
+				if ( di == 4 )
+				{
+					fputc ('.', fld);
+					stri=1;
+				}
+				di++;
+			}
+			else
+			{
+				di=0;
+			}
+			fputc (cr, fld);
+			if ( cr == '\n')
+			{
+				if ( stri == 1 )
+				{
+					fprintf (fld, "%s\r\n", "G00 Z0.000 " );
+					fprintf (fld, "%s\r\n", "G01 Z-2.000 " );
+					fprintf (fld, "%s\r\n", "G00 Z2.000 " );
+					stri = 0;
+				}
+			} 
+		}
+	}
+
 	fclose(file);
-    fclose(fld);
+    	fclose(fld);
 	printf ("%s\n","Window done");
 
 	//////////////////////////////////////////////////////////////////////////
